@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ngrestaurant-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ngrestaurant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ngrestaurant}
+      POSTGRES_DB: ${POSTGRES_DB:-ngrestaurant}
+    ports:
+      - "5432:5432"   # host:container — PostgreSQL at localhost:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ngrestaurant} -d ${POSTGRES_DB:-ngrestaurant}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: ngrestaurant-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: ${PORT:-3000}
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ngrestaurant}:${POSTGRES_PASSWORD:-ngrestaurant}@postgres:5432/${POSTGRES_DB:-ngrestaurant}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+    ports:
+      - "3000:3000"   # host:container — API at http://localhost:3000
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: ngrestaurant-web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"     # host:container — Angular at http://localhost:8080 (nginx on 80; 4200 reserved for dev/ng serve)
+
+volumes:
+  postgres_data:

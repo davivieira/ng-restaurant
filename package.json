@@ -1,0 +1,25 @@
+{
+  "name": "ng-restaurant",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:dev:up": "docker compose -p ngrestaurant-dev -f docker-compose.yml -f docker-compose.dev.yml up -d --build",
+    "docker:dev:down": "docker compose -p ngrestaurant-dev -f docker-compose.yml -f docker-compose.dev.yml down",
+    "api:install": "npm install --prefix apps/api",
+    "api:start": "npm run start --prefix apps/api",
+    "api:start:dev": "npm run start:dev --prefix apps/api",
+    "api:test": "npm run test --prefix apps/api",
+    "api:lint": "npm run lint --prefix apps/api",
+    "api:build": "npm run build --prefix apps/api",
+    "web:install": "npm install --prefix apps/web",
+    "web:start": "npm run start --prefix apps/web",
+    "web:build": "npm run build --prefix apps/web",
+    "web:test": "npm run test --prefix apps/web",
+    "test": "npm run api:test && npm run web:test",
+    "lint": "npm run api:lint",
+    "check": "npm run api:lint && npm run api:build && npm run api:test && npm run web:build && npm run web:test"
+  }
+}

@@ -1,0 +1,20 @@
+import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
+
+export class RegisterDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(8, { message: 'Password must be at least 8 characters' })
+  password: string;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(200)
+  restaurantName: string;
+}
