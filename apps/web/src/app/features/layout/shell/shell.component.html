@@ -22,6 +22,11 @@
       <a routerLink="/menu" routerLinkActive="active" class="nav-link">
         Menu
       </a>
+      @if (role() === 'admin' || role() === 'waiter') {
+        <a routerLink="/tables" routerLinkActive="active" class="nav-link">
+          Tables
+        </a>
+      }
       @if (role() === 'admin') {
         <a routerLink="/users" routerLinkActive="active" class="nav-link">
           Team

@@ -1,33 +1,4 @@
-.back-link {
-  font-size: 0.9375rem;
-  color: var(--ngr-primary);
-  text-decoration: none;
-  margin-bottom: 0.5rem;
-  display: inline-block;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.page-title {
-  margin: 0 0 1rem;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--ngr-text-primary);
-}
-
-.page-error {
-  margin: 0 0 1rem;
-  font-size: 0.9375rem;
-  color: var(--ngr-error);
-}
-
-.page-muted {
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--ngr-text-muted);
-}
+@use '../../../../shared/styles/page-common' as *;
 
 .manage-sections {
   display: flex;
@@ -51,12 +22,6 @@
 }
 
 .input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--ngr-border);
-  border-radius: var(--ngr-radius);
-  font-size: 0.9375rem;
-  color: var(--ngr-text-primary);
-  background: var(--ngr-bg-card);
   min-width: 200px;
 }
 
@@ -101,54 +66,10 @@
   gap: 0.5rem;
 }
 
-.link-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: 0.875rem;
-  color: var(--ngr-primary);
-  cursor: pointer;
-  text-decoration: underline;
-
-  &.danger {
-    color: var(--ngr-error);
-  }
-
-  &:hover {
-    opacity: 0.9;
-  }
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9375rem;
-
-  th,
-  td {
-    padding: 0.5rem 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--ngr-border);
-  }
-
-  th {
-    font-weight: 600;
-    color: var(--ngr-text-secondary);
-  }
-
-  .desc-cell {
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--ngr-text-muted);
-  }
-
-  .actions-cell {
-    white-space: nowrap;
-  }
-
-  .actions-cell .link-btn {
-    margin-right: 0.5rem;
-  }
+.table .desc-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ngr-text-muted);
 }

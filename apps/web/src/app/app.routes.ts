@@ -9,6 +9,10 @@ import { MenuListPage } from './features/menu/pages/menu-list/menu-list.page';
 import { MenuManagePage } from './features/menu/pages/menu-manage/menu-manage.page';
 import { DishFormPage } from './features/menu/pages/dish-form/dish-form.page';
 import { TeamPage } from './features/users/pages/team/team.page';
+import { TablesListPage } from './features/tables/pages/tables-list/tables-list.page';
+import { TablesManagePage } from './features/tables/pages/tables-manage/tables-manage.page';
+import { OrdersByTablePage } from './features/orders/pages/orders-by-table/orders-by-table.page';
+import { OrderNewPage } from './features/orders/pages/order-new/order-new.page';
 
 export const routes: Routes = [
   { path: 'login', component: LoginPage },
@@ -20,6 +24,20 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardPage },
       { path: 'menu', component: MenuListPage },
+      { path: 'tables', component: TablesListPage },
+      {
+        path: 'tables/manage',
+        component: TablesManagePage,
+        canActivate: [roleGuard(['admin'])],
+      },
+      {
+        path: 'tables/:tableId/orders',
+        component: OrdersByTablePage,
+      },
+      {
+        path: 'tables/:tableId/orders/new',
+        component: OrderNewPage,
+      },
       {
         path: 'users',
         component: TeamPage,

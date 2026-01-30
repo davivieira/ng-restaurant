@@ -79,4 +79,45 @@ describe('AuthService', () => {
       temporaryPassword: 'temp123',
     });
   });
+
+  it('should post to /auth/staff with name, email and role', () => {
+    service.createStaff('Kitchen', 'k@test.com', 'kitchen').subscribe((res) => {
+      expect(res.user.email).toBe('k@test.com');
+      expect(res.user.name).toBe('Kitchen');
+      expect(res.user.role).toBe('kitchen');
+      expect(res.temporaryPassword).toBe('temp456');
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/staff`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ name: 'Kitchen', email: 'k@test.com', role: 'kitchen' });
+    req.flush({
+      user: { id: '3', email: 'k@test.com', name: 'Kitchen', role: 'kitchen', restaurantId: 'r1' },
+      temporaryPassword: 'temp456',
+    });
+  });
+
+  it('should get staff from GET /auth/staff with optional role param', () => {
+    const staff = [
+      { id: '2', email: 'w@test.com', name: 'Waiter', role: 'waiter', restaurantId: 'r1' },
+    ];
+    service.getStaff('waiter').subscribe((res) => {
+      expect(res).toEqual(staff);
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/staff?role=waiter`);
+    expect(req.request.method).toBe('GET');
+    req.flush(staff);
+  });
+
+  it('should get all staff from GET /auth/staff when no role', () => {
+    const staff = [
+      { id: '2', email: 'w@test.com', name: 'Waiter', role: 'waiter', restaurantId: 'r1' },
+      { id: '3', email: 'k@test.com', name: 'Kitchen', role: 'kitchen', restaurantId: 'r1' },
+    ];
+    service.getStaff().subscribe((res) => {
+      expect(res).toEqual(staff);
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/staff`);
+    expect(req.request.method).toBe('GET');
+    req.flush(staff);
+  });
 });

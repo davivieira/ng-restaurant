@@ -1,14 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpRequest } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
+import { authActions } from '../../features/auth/state/auth.actions';
 
 describe('authInterceptor', () => {
-  let storeMock: { select: ReturnType<typeof vi.fn> };
+  let storeMock: { select: ReturnType<typeof vi.fn>; dispatch: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    storeMock = { select: vi.fn() };
+    storeMock = { select: vi.fn(), dispatch: vi.fn() };
     TestBed.configureTestingModule({
       providers: [{ provide: Store, useValue: storeMock }],
     });
@@ -50,6 +51,44 @@ describe('authInterceptor', () => {
           resolve();
         },
         error: reject,
+      });
+    });
+  });
+
+  it('should dispatch logout and complete without error on 401 for non-auth endpoints', async () => {
+    storeMock.select.mockReturnValue(of('jwt-token'));
+    const req = new HttpRequest('GET', '/api/tables');
+    const next = vi.fn().mockReturnValue(
+      throwError(() => ({ status: 401, message: 'Unauthorized' }))
+    );
+    const interceptor = TestBed.runInInjectionContext(() => authInterceptor(req, next));
+    await new Promise<void>((resolve, reject) => {
+      interceptor.subscribe({
+        next: () => {},
+        complete: () => {
+          expect(storeMock.dispatch).toHaveBeenCalledWith(authActions.logout());
+          resolve();
+        },
+        error: reject,
+      });
+    });
+  });
+
+  it('should rethrow 401 for auth/login so login page can show message', async () => {
+    storeMock.select.mockReturnValue(of(null));
+    const req = new HttpRequest('POST', '/api/auth/login', { email: 'a@b.com', password: 'x' });
+    const next = vi.fn().mockReturnValue(
+      throwError(() => ({ status: 401, error: { message: 'Invalid credentials' } }))
+    );
+    const interceptor = TestBed.runInInjectionContext(() => authInterceptor(req, next));
+    await new Promise<void>((resolve, reject) => {
+      interceptor.subscribe({
+        error: (err) => {
+          expect(err.status).toBe(401);
+          expect(storeMock.dispatch).not.toHaveBeenCalled();
+          resolve();
+        },
+        complete: () => reject(new Error('expected error')),
       });
     });
   });

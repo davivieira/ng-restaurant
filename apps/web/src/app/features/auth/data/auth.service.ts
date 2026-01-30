@@ -9,6 +9,10 @@ export interface CreateWaiterResponse {
   temporaryPassword: string;
 }
 
+export type CreateStaffResponse = CreateWaiterResponse;
+
+export type StaffRole = 'waiter' | 'kitchen';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -39,5 +43,22 @@ export class AuthService {
 
   getWaiters() {
     return this.http.get<AuthUser[]>(`${this.apiUrl}/auth/waiters`);
+  }
+
+  createStaff(name: string, email: string, role: StaffRole) {
+    return this.http.post<CreateStaffResponse>(`${this.apiUrl}/auth/staff`, {
+      name,
+      email,
+      role,
+    });
+  }
+
+  getStaff(role?: StaffRole) {
+    if (role) {
+      return this.http.get<AuthUser[]>(`${this.apiUrl}/auth/staff`, {
+        params: { role },
+      });
+    }
+    return this.http.get<AuthUser[]>(`${this.apiUrl}/auth/staff`);
   }
 }

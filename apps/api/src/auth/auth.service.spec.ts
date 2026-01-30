@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { Restaurant } from '../entities/restaurant.entity';
 import { User, UserRole } from '../entities/user.entity';
 import { AuthService } from './auth.service';
+import { CreateStaffDto } from './dto/create-staff.dto';
+import { CreateWaiterDto } from './dto/create-waiter.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -48,6 +50,7 @@ describe('AuthService', () => {
           provide: getRepositoryToken(User),
           useValue: {
             findOne: jest.fn(),
+            find: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
           },
@@ -205,6 +208,200 @@ describe('AuthService', () => {
       const result = await service.validateUser(payload);
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('createWaiter', () => {
+    const dto: CreateWaiterDto = {
+      name: 'Waiter One',
+      email: 'waiter@test.com',
+    };
+    const savedWaiter = {
+      id: 'w1',
+      email: 'waiter@test.com',
+      passwordHash: 'hashed',
+      name: 'Waiter One',
+      role: UserRole.WAITER,
+      restaurantId: 'rest-1',
+      createdAt: new Date(),
+    } as User;
+
+    it('should create waiter and return user with temporaryPassword', async () => {
+      (userRepo.findOne as jest.Mock).mockResolvedValue(null);
+      (userRepo.create as jest.Mock).mockReturnValue(savedWaiter);
+      (userRepo.save as jest.Mock).mockResolvedValue(savedWaiter);
+
+      const result = await service.createWaiter('rest-1', dto);
+
+      expect(userRepo.findOne).toHaveBeenCalledWith({
+        where: { email: 'waiter@test.com' },
+      });
+      expect(bcrypt.hash).toHaveBeenCalled();
+      expect(userRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          email: 'waiter@test.com',
+          name: 'Waiter One',
+          role: UserRole.WAITER,
+          restaurantId: 'rest-1',
+        }),
+      );
+      expect(result.user).toEqual({
+        id: savedWaiter.id,
+        email: savedWaiter.email,
+        name: savedWaiter.name,
+        role: savedWaiter.role,
+        restaurantId: savedWaiter.restaurantId,
+      });
+      expect(result.temporaryPassword).toBeDefined();
+      expect(typeof result.temporaryPassword).toBe('string');
+    });
+
+    it('should throw ConflictException when email already registered', async () => {
+      (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
+
+      await expect(service.createWaiter('rest-1', dto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(service.createWaiter('rest-1', dto)).rejects.toThrow(
+        'Email already registered',
+      );
+      expect(userRepo.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('createStaff', () => {
+    const dtoWaiter: CreateStaffDto = {
+      name: 'Staff One',
+      email: 'staff@test.com',
+      role: UserRole.WAITER,
+    };
+    const dtoKitchen: CreateStaffDto = {
+      name: 'Chef One',
+      email: 'chef@test.com',
+      role: UserRole.KITCHEN,
+    };
+    const savedStaff = {
+      id: 's1',
+      email: 'staff@test.com',
+      passwordHash: 'hashed',
+      name: 'Staff One',
+      role: UserRole.WAITER,
+      restaurantId: 'rest-1',
+      createdAt: new Date(),
+    } as User;
+
+    it('should create staff with waiter role', async () => {
+      (userRepo.findOne as jest.Mock).mockResolvedValue(null);
+      (userRepo.create as jest.Mock).mockReturnValue(savedStaff);
+      (userRepo.save as jest.Mock).mockResolvedValue(savedStaff);
+
+      const result = await service.createStaff('rest-1', dtoWaiter);
+
+      expect(userRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: UserRole.WAITER }),
+      );
+      expect(result.user.role).toBe(UserRole.WAITER);
+    });
+
+    it('should create staff with kitchen role', async () => {
+      const kitchenUser = { ...savedStaff, role: UserRole.KITCHEN };
+      (userRepo.findOne as jest.Mock).mockResolvedValue(null);
+      (userRepo.create as jest.Mock).mockReturnValue(kitchenUser);
+      (userRepo.save as jest.Mock).mockResolvedValue(kitchenUser);
+
+      const result = await service.createStaff('rest-1', dtoKitchen);
+
+      expect(userRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: UserRole.KITCHEN }),
+      );
+      expect(result.user.role).toBe(UserRole.KITCHEN);
+    });
+
+    it('should throw ConflictException when email already registered', async () => {
+      (userRepo.findOne as jest.Mock).mockResolvedValue(mockUser);
+
+      await expect(service.createStaff('rest-1', dtoWaiter)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(userRepo.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('findWaitersByRestaurant', () => {
+    it('should return waiters for restaurant', async () => {
+      const waiters = [
+        {
+          id: 'w1',
+          email: 'w@test.com',
+          name: 'Waiter',
+          role: UserRole.WAITER,
+          restaurantId: 'rest-1',
+        },
+      ];
+      (userRepo.find as jest.Mock).mockResolvedValue(waiters);
+
+      const result = await service.findWaitersByRestaurant('rest-1');
+
+      expect(userRepo.find).toHaveBeenCalledWith({
+        where: { restaurantId: 'rest-1', role: UserRole.WAITER },
+        order: { name: 'ASC' },
+        select: ['id', 'email', 'name', 'role', 'restaurantId'],
+      });
+      expect(result).toEqual(waiters);
+    });
+  });
+
+  describe('findStaffByRestaurant', () => {
+    it('should return staff filtered by role when role provided', async () => {
+      const kitchen = [
+        {
+          id: 'k1',
+          email: 'k@test.com',
+          name: 'Chef',
+          role: UserRole.KITCHEN,
+          restaurantId: 'rest-1',
+        },
+      ];
+      (userRepo.find as jest.Mock).mockResolvedValue(kitchen);
+
+      const result = await service.findStaffByRestaurant(
+        'rest-1',
+        UserRole.KITCHEN,
+      );
+
+      expect(userRepo.find).toHaveBeenCalledWith({
+        where: { restaurantId: 'rest-1', role: UserRole.KITCHEN },
+        order: { name: 'ASC' },
+        select: ['id', 'email', 'name', 'role', 'restaurantId'],
+      });
+      expect(result).toEqual(kitchen);
+    });
+
+    it('should return all staff (waiter and kitchen) when role not provided', async () => {
+      const staff = [
+        {
+          id: 'w1',
+          email: 'w@test.com',
+          name: 'Waiter',
+          role: UserRole.WAITER,
+          restaurantId: 'rest-1',
+        },
+      ];
+      (userRepo.find as jest.Mock).mockResolvedValue(staff);
+
+      const result = await service.findStaffByRestaurant('rest-1');
+
+      expect(userRepo.find).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            restaurantId: 'rest-1',
+            role: expect.anything(),
+          }),
+          order: { name: 'ASC' },
+          select: ['id', 'email', 'name', 'role', 'restaurantId'],
+        }),
+      );
+      expect(result).toEqual(staff);
     });
   });
 });

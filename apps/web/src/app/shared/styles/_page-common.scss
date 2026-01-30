@@ -1,0 +1,131 @@
+// Shared page layout and form styles. Use with: @use 'shared/styles/page-common' as common;
+
+.back-link {
+  font-size: 0.9375rem;
+  color: var(--ngr-primary);
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.page-title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ngr-text-primary);
+}
+
+.page-error {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  color: var(--ngr-error);
+}
+
+.page-muted {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ngr-text-muted);
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.edit-link {
+  text-decoration: none;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ngr-text-secondary);
+  }
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ngr-border);
+  border-radius: var(--ngr-radius);
+  font-size: 0.9375rem;
+  color: var(--ngr-text-primary);
+  background: var(--ngr-bg-card);
+
+  &.input-inline {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--ngr-border);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--ngr-text-secondary);
+  }
+
+  .status-cell {
+    text-transform: capitalize;
+    color: var(--ngr-text-muted);
+  }
+
+  .actions-cell {
+    white-space: nowrap;
+
+    .link-btn {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--ngr-primary);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &.danger {
+    color: var(--ngr-error);
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}

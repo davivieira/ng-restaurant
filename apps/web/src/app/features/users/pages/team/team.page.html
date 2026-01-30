@@ -1,5 +1,5 @@
 <h1 class="page-title">Team</h1>
-<p class="page-subtitle">Add waiters to your restaurant. They will receive a temporary password to sign in.</p>
+<p class="page-subtitle">Add waiters and kitchen workers to your restaurant. They will receive a temporary password to sign in.</p>
 
 @if (error(); as err) {
   <p class="page-error">{{ err }}</p>
@@ -7,7 +7,7 @@
 
 <div class="team-content">
   @if (created(); as c) {
-    <app-card title="Waiter added">
+    <app-card [title]="c.role === 'waiter' ? 'Waiter added' : 'Kitchen worker added'">
       <p class="success-message">
         Share this temporary password with <strong>{{ c.email }}</strong>. They can sign in at the login page.
       </p>
@@ -19,65 +19,106 @@
     </app-card>
   }
 
-  <app-card title="Add waiter">
-  <form class="form" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input
-        id="name"
-        type="text"
-        [ngModel]="name()"
-        (ngModelChange)="name.set($event)"
-        name="name"
-        class="input"
-        placeholder="Waiter name"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        [ngModel]="email()"
-        (ngModelChange)="email.set($event)"
-        name="email"
-        class="input"
-        placeholder="waiter@example.com"
-        required
-      />
-    </div>
-    <div class="form-actions">
-      <app-button type="submit" label="Add waiter" variant="primary" [disabled]="loading()" />
-    </div>
-  </form>
-</app-card>
+  <app-card title="Add team member">
+    <form class="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          id="name"
+          type="text"
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+          name="name"
+          class="input"
+          placeholder="Name"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          name="email"
+          class="input"
+          placeholder="member@example.com"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select
+          id="role"
+          [ngModel]="role()"
+          (ngModelChange)="role.set($event)"
+          name="role"
+          class="input"
+        >
+          <option value="waiter">Waiter</option>
+          <option value="kitchen">Kitchen worker</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <app-button type="submit" label="Add member" variant="primary" [disabled]="loading()" />
+      </div>
+    </form>
+  </app-card>
 
-<app-card title="Waiters">
-  @if (loadingWaiters()) {
-    <p class="page-muted">Loading waiters…</p>
-  } @else {
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (w of waiters(); track w.id) {
+  <app-card title="Waiters">
+    @if (loadingWaiters()) {
+      <p class="page-muted">Loading waiters…</p>
+    } @else {
+      <table class="table">
+        <thead>
           <tr>
-            <td>{{ w.name }}</td>
-            <td>{{ w.email }}</td>
-            <td>{{ w.role }}</td>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
           </tr>
-        }
-      </tbody>
-    </table>
-    @if (waiters().length === 0) {
-      <p class="page-muted">No waiters yet. Add one above.</p>
+        </thead>
+        <tbody>
+          @for (w of waiters(); track w.id) {
+            <tr>
+              <td>{{ w.name }}</td>
+              <td>{{ w.email }}</td>
+              <td>{{ w.role }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (waiters().length === 0) {
+        <p class="page-muted">No waiters yet. Add one above.</p>
+      }
     }
-  }
-</app-card>
+  </app-card>
+
+  <app-card title="Kitchen workers">
+    @if (loadingKitchen()) {
+      <p class="page-muted">Loading kitchen workers…</p>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (k of kitchen(); track k.id) {
+            <tr>
+              <td>{{ k.name }}</td>
+              <td>{{ k.email }}</td>
+              <td>{{ k.role }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (kitchen().length === 0) {
+        <p class="page-muted">No kitchen workers yet. Add one above.</p>
+      }
+    }
+  </app-card>
 </div>

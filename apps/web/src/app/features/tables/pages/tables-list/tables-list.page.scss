@@ -1,0 +1,46 @@
+@use '../../../../shared/styles/page-common' as *;
+
+.table-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.table-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--ngr-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.table-name {
+  font-weight: 500;
+  color: var(--ngr-text-primary);
+  min-width: 120px;
+}
+
+.table-status {
+  font-size: 0.875rem;
+  color: var(--ngr-text-muted);
+  text-transform: capitalize;
+
+  &.occupied {
+    color: var(--ngr-primary);
+  }
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.view-orders-link {
+  text-decoration: none;
+}

@@ -1,0 +1,96 @@
+<p><a routerLink="/tables" class="back-link">← Back to Tables</a></p>
+<h1 class="page-title">Manage tables</h1>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+@if (loading()) {
+  <p class="page-muted">Loading…</p>
+} @else {
+  <div class="manage-content">
+    <app-card title="Add table">
+      <form class="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input
+            id="name"
+            type="text"
+            [ngModel]="name()"
+            (ngModelChange)="name.set($event)"
+            name="name"
+            class="input"
+            placeholder="e.g. Table 1"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select
+            id="status"
+            [ngModel]="status()"
+            (ngModelChange)="status.set($event)"
+            name="status"
+            class="input"
+          >
+            <option value="free">Free</option>
+            <option value="occupied">Occupied</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <app-button type="submit" label="Add table" variant="primary" />
+        </div>
+      </form>
+    </app-card>
+
+    <app-card title="Tables">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of tables(); track t.id) {
+            <tr>
+              @if (editingId() === t.id) {
+                <td>
+                  <input
+                    type="text"
+                    [ngModel]="editingName()"
+                    (ngModelChange)="editingName.set($event)"
+                    class="input input-inline"
+                  />
+                </td>
+                <td>
+                  <select
+                    [ngModel]="editingStatus()"
+                    (ngModelChange)="editingStatus.set($event)"
+                    class="input input-inline"
+                  >
+                    <option value="free">Free</option>
+                    <option value="occupied">Occupied</option>
+                  </select>
+                </td>
+                <td class="actions-cell">
+                  <app-button label="Save" variant="primary" (clicked)="saveEdit()" />
+                  <app-button label="Cancel" variant="secondary" (clicked)="cancelEdit()" />
+                </td>
+              } @else {
+                <td>{{ t.name }}</td>
+                <td class="status-cell">{{ t.status }}</td>
+                <td class="actions-cell">
+                  <button type="button" class="link-btn" (click)="startEdit(t)">Edit</button>
+                  <button type="button" class="link-btn danger" (click)="deleteTable(t)">Delete</button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (tables().length === 0) {
+        <p class="page-muted">No tables yet. Add one above.</p>
+      }
+    </app-card>
+  </div>
+}

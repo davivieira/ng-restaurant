@@ -1,0 +1,55 @@
+<p><a [routerLink]="['/tables', tableId(), 'orders']" class="back-link">← Back to Orders</a></p>
+<h1 class="page-title">New order {{ table() ? '– ' + table()!.name : '' }}</h1>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+<form class="order-form" (ngSubmit)="submit()">
+  <div class="menu-by-category">
+    @for (group of grouped(); track group.category.id) {
+      <app-card [title]="group.category.name">
+        <ul class="dish-list">
+          @for (dish of group.dishes; track trackDish(dish)) {
+            @if (dish.isActive) {
+              <li class="dish-row">
+                <span class="dish-name">{{ dish.name }}</span>
+                @if (dish.description) {
+                  <span class="dish-desc">{{ dish.description }}</span>
+                }
+                <span class="dish-price">{{ dish.price }}</span>
+                <div class="dish-order">
+                  <app-quantity-input
+                    [inputId]="'qty-' + dish.id"
+                    [value]="getLine(dish.id).quantity"
+                    [min]="0"
+                    (valueChange)="setQuantity(dish.id, $event)"
+                  />
+                  <input
+                    type="text"
+                    [value]="getLine(dish.id).observations"
+                    (input)="setObservations(dish.id, $any($event.target).value)"
+                    class="input obs-input"
+                    placeholder="Observations"
+                  />
+                </div>
+              </li>
+            }
+          }
+        </ul>
+        @if (group.dishes.length === 0) {
+          <p class="page-muted">No dishes in this category.</p>
+        }
+      </app-card>
+    }
+  </div>
+  @if (grouped().length === 0) {
+    <app-card title="Menu">
+      <p class="page-muted">No menu items. Add dishes in Manage menu (admin).</p>
+    </app-card>
+  }
+  <div class="form-actions">
+    <app-button type="submit" label="Submit order" variant="primary" [disabled]="!hasItems() || loading()" />
+    <a [routerLink]="['/tables', tableId(), 'orders']" class="cancel-link">
+      <app-button type="button" label="Cancel" variant="secondary" />
+    </a>
+  </div>
+</form>

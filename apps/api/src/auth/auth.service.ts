@@ -7,10 +7,11 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, In, Repository } from 'typeorm';
 import { Restaurant } from '../entities/restaurant.entity';
 import { User, UserRole } from '../entities/user.entity';
 import { CreateWaiterDto } from './dto/create-waiter.dto';
+import { CreateStaffDto } from './dto/create-staff.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -36,6 +37,8 @@ export interface CreateWaiterResponse {
   user: AuthResponse['user'];
   temporaryPassword: string;
 }
+
+export type CreateStaffResponse = CreateWaiterResponse;
 
 @Injectable()
 export class AuthService {
@@ -148,8 +151,51 @@ export class AuthService {
   async findWaitersByRestaurant(
     restaurantId: string,
   ): Promise<AuthResponse['user'][]> {
+    return this.findStaffByRestaurant(restaurantId, UserRole.WAITER);
+  }
+
+  async createStaff(
+    restaurantId: string,
+    dto: CreateStaffDto,
+  ): Promise<CreateStaffResponse> {
+    const existingUser = await this.userRepo.findOne({
+      where: { email: dto.email.toLowerCase() },
+    });
+    if (existingUser) {
+      throw new ConflictException('Email already registered');
+    }
+    const temporaryPassword = this.generateTemporaryPassword();
+    const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+    const user = this.userRepo.create({
+      email: dto.email.toLowerCase(),
+      passwordHash,
+      name: dto.name.trim(),
+      role: dto.role,
+      restaurantId,
+    });
+    const savedUser = await this.userRepo.save(user);
+    return {
+      user: {
+        id: savedUser.id,
+        email: savedUser.email,
+        name: savedUser.name,
+        role: savedUser.role,
+        restaurantId: savedUser.restaurantId,
+      },
+      temporaryPassword,
+    };
+  }
+
+  async findStaffByRestaurant(
+    restaurantId: string,
+    role?: UserRole.WAITER | UserRole.KITCHEN,
+  ): Promise<AuthResponse['user'][]> {
+    const where: FindOptionsWhere<User> = {
+      restaurantId,
+      role: role ?? In([UserRole.WAITER, UserRole.KITCHEN]),
+    };
     const users = await this.userRepo.find({
-      where: { restaurantId, role: UserRole.WAITER },
+      where,
       order: { name: 'ASC' },
       select: ['id', 'email', 'name', 'role', 'restaurantId'],
     });

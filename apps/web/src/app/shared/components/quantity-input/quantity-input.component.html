@@ -1,0 +1,33 @@
+<div class="quantity-input">
+  @if (label(); as lbl) {
+    <label [attr.for]="inputId() || null" class="quantity-label">{{ lbl }}</label>
+  }
+  <div class="quantity-group">
+    <button
+      type="button"
+      class="quantity-btn quantity-btn-minus"
+      [attr.aria-label]="'Decrease ' + label()"
+      [disabled]="value() <= min()"
+      (click)="decrement()"
+    >
+      −
+    </button>
+    <input
+      [id]="inputId()"
+      type="number"
+      [value]="value()"
+      [min]="min()"
+      class="quantity-field"
+      (input)="onInput($event)"
+      [attr.aria-label]="label()"
+    />
+    <button
+      type="button"
+      class="quantity-btn quantity-btn-plus"
+      [attr.aria-label]="'Increase ' + label()"
+      (click)="increment()"
+    >
+      +
+    </button>
+  </div>
+</div>

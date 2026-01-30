@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/data/auth.service';
 import type { AuthUser } from '../../../auth/models/auth-user.model';
+import type { StaffRole } from '../../../auth/data/auth.service';
 import { CardComponent, ButtonComponent } from '../../../../shared';
 
 @Component({
@@ -16,21 +17,25 @@ export class TeamPage implements OnInit {
 
   name = signal('');
   email = signal('');
+  role = signal<StaffRole>('waiter');
   loading = signal(false);
   loadingWaiters = signal(false);
+  loadingKitchen = signal(false);
   error = signal<string | null>(null);
   waiters = signal<AuthUser[]>([]);
+  kitchen = signal<AuthUser[]>([]);
   /** Set after successful create; shows one-time temporary password. */
-  created = signal<{ email: string; temporaryPassword: string } | null>(null);
+  created = signal<{ email: string; role: string; temporaryPassword: string } | null>(null);
 
   ngOnInit() {
     this.loadWaiters();
+    this.loadKitchen();
   }
 
   loadWaiters() {
     this.loadingWaiters.set(true);
-    this.authService.getWaiters().subscribe({
-      next: (list) => {
+    this.authService.getStaff('waiter').subscribe({
+      next: (list: AuthUser[]) => {
         this.waiters.set(list);
         this.loadingWaiters.set(false);
       },
@@ -38,9 +43,21 @@ export class TeamPage implements OnInit {
     });
   }
 
+  loadKitchen() {
+    this.loadingKitchen.set(true);
+    this.authService.getStaff('kitchen').subscribe({
+      next: (list: AuthUser[]) => {
+        this.kitchen.set(list);
+        this.loadingKitchen.set(false);
+      },
+      error: () => this.loadingKitchen.set(false),
+    });
+  }
+
   onSubmit() {
     const name = this.name().trim();
     const email = this.email().trim();
+    const staffRole = this.role();
     this.error.set(null);
     this.created.set(null);
     if (!name || !email) {
@@ -48,20 +65,28 @@ export class TeamPage implements OnInit {
       return;
     }
     this.loading.set(true);
-    this.authService.createWaiter(name, email).subscribe({
+    this.authService.createStaff(name, email, staffRole).subscribe({
       next: (res) => {
         this.loading.set(false);
-        this.created.set({ email: res.user.email, temporaryPassword: res.temporaryPassword });
+        this.created.set({
+          email: res.user.email,
+          role: res.user.role,
+          temporaryPassword: res.temporaryPassword,
+        });
         this.name.set('');
         this.email.set('');
-        this.waiters.update((list) => [...list, res.user]);
+        if (res.user.role === 'waiter') {
+          this.waiters.update((list) => [...list, res.user]);
+        } else {
+          this.kitchen.update((list) => [...list, res.user]);
+        }
       },
       error: (err) => {
         this.loading.set(false);
         const msg =
           err?.error?.message ??
           err?.message ??
-          (err?.status === 409 ? 'Email already registered.' : 'Failed to add waiter.');
+          (err?.status === 409 ? 'Email already registered.' : 'Failed to add member.');
         this.error.set(msg);
       },
     });

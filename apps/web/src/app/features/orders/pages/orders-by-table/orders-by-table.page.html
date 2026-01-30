@@ -1,0 +1,54 @@
+<p><a routerLink="/tables" class="back-link">← Back to Tables</a></p>
+<h1 class="page-title">Orders {{ table() ? '– ' + table()!.name : '' }}</h1>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+<div class="page-actions">
+  <app-button label="New order" variant="primary" (clicked)="goToNewOrder()" />
+  @if (table()?.status === 'occupied') {
+    <app-button
+      label="Mark bill as paid"
+      variant="secondary"
+      (clicked)="markBillAsPaid()"
+    />
+  }
+</div>
+@if (loading()) {
+  <p class="page-muted">Loading orders…</p>
+} @else {
+  <app-card title="Orders">
+    @if (orders().length === 0) {
+      <p class="page-muted">No orders for this table yet. Create one with "New order".</p>
+    } @else {
+      <div class="orders-list">
+        @for (order of orders(); track order.id) {
+          <div class="order-card">
+            <div class="order-header">
+              <span class="order-status" [class]="'status-' + order.status">{{ order.status }}</span>
+              <span class="order-date">{{ order.createdAt ? (order.createdAt | date:'short') : '' }}</span>
+              @if (order.waiter) {
+                <span class="order-waiter">{{ order.waiter.name }}</span>
+              }
+            </div>
+            <ul class="order-items">
+              @for (item of order.items; track item.id) {
+                <li class="order-item">
+                  <span class="item-name">{{ item.dish?.name ?? 'Dish' }}</span>
+                  <span class="item-qty">× {{ item.quantity }}</span>
+                  @if (item.observations) {
+                    <span class="item-obs">{{ item.observations }}</span>
+                  }
+                </li>
+              }
+            </ul>
+            @if (canCancel(order)) {
+              <div class="order-actions">
+                <app-button label="Cancel order" variant="secondary" (clicked)="cancelOrder(order)" />
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </app-card>
+}

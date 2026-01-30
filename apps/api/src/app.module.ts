@@ -4,10 +4,15 @@ import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { MenuModule } from './menu/menu.module';
+import { TablesModule } from './tables/tables.module';
+import { OrdersModule } from './orders/orders.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { Category } from './entities/category.entity';
 import { Dish } from './entities/dish.entity';
+import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
 import { Restaurant } from './entities/restaurant.entity';
+import { TableEntity } from './entities/table.entity';
 import { User } from './entities/user.entity';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
@@ -18,12 +23,22 @@ import { AppController } from './app.controller';
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [User, Restaurant, Category, Dish],
+      entities: [
+        User,
+        Restaurant,
+        Category,
+        Dish,
+        TableEntity,
+        Order,
+        OrderItem,
+      ],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV === 'development',
     }),
     AuthModule,
     MenuModule,
+    TablesModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [

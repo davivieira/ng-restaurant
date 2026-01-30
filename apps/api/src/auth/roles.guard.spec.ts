@@ -3,7 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserRole } from '../entities/user.entity';
 import type { RequestUser } from './current-user.decorator';
-import { ROLES_KEY } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
 
 describe('RolesGuard', () => {

@@ -1,0 +1,41 @@
+<div class="page-header">
+  <h1 class="page-title">Tables</h1>
+  @if (role() === 'admin') {
+    <a routerLink="/tables/manage" class="edit-link">
+      <app-button label="Manage tables" variant="primary" />
+    </a>
+  }
+</div>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+@if (loading()) {
+  <p class="page-muted">Loading tables…</p>
+} @else {
+  <app-card title="Tables">
+    @if (tables().length === 0) {
+      <p class="page-muted">No tables yet. Add tables in Manage tables (admin).</p>
+    } @else {
+      <ul class="table-list">
+        @for (t of tables(); track t.id) {
+          <li class="table-item">
+            <span class="table-name">{{ t.name }}</span>
+            <span class="table-status" [class.occupied]="t.status === 'occupied'">{{ t.status }}</span>
+            <div class="table-actions">
+              @if (t.status === 'free') {
+                <app-button
+                  label="Set as occupied"
+                  variant="primary"
+                  (clicked)="setOccupied(t)"
+                />
+              }
+              <a [routerLink]="['/tables', t.id, 'orders']" class="view-orders-link">
+                <app-button label="View orders" variant="secondary" />
+              </a>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </app-card>
+}
