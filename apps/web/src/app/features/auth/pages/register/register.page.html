@@ -1,0 +1,74 @@
+<div class="register-page">
+  <div class="register-card">
+    <h1 class="register-title">NgRestaurant</h1>
+    <p class="register-subtitle">Create your restaurant account</p>
+
+    @if (error(); as err) {
+      <div class="register-error">{{ err }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()" class="register-form">
+      <label class="label" for="name">Your name</label>
+      <input
+        id="name"
+        type="text"
+        class="input"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        name="name"
+        required
+        autocomplete="name"
+      />
+
+      <label class="label" for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        class="input"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        name="email"
+        required
+        autocomplete="email"
+      />
+
+      <label class="label" for="password">Password (min 8 characters)</label>
+      <input
+        id="password"
+        type="password"
+        class="input"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        name="password"
+        required
+        minlength="8"
+        autocomplete="new-password"
+      />
+
+      <label class="label" for="restaurantName">Restaurant name</label>
+      <input
+        id="restaurantName"
+        type="text"
+        class="input"
+        [ngModel]="restaurantName()"
+        (ngModelChange)="restaurantName.set($event)"
+        name="restaurantName"
+        required
+      />
+
+      <button type="submit" class="btn btn-primary" [disabled]="loading()">
+        @if (loading()) {
+          <span class="btn-spinner" aria-hidden="true"></span>
+          <span>Creating…</span>
+        } @else {
+          Register
+        }
+      </button>
+    </form>
+
+    <p class="register-footer">
+      Already have an account?
+      <a routerLink="/login" class="link">Sign in</a>
+    </p>
+  </div>
+</div>

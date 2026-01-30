@@ -1,0 +1,23 @@
+.dashboard-title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ngr-text-primary);
+}
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-placeholder,
+.dashboard-muted {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ngr-text-secondary);
+}
+
+.dashboard-muted {
+  color: var(--ngr-text-muted);
+}

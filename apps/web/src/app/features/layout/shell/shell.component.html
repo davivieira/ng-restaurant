@@ -1,0 +1,43 @@
+<div class="shell">
+  @if (menuOpen()) {
+    <div
+      class="sidebar-overlay"
+      (click)="closeMenu()"
+      role="button"
+      tabindex="0"
+      aria-label="Close menu"
+    ></div>
+  }
+  <aside class="sidebar" [class.sidebar-open]="menuOpen()">
+    <div class="sidebar-header">
+      <span class="sidebar-brand">NgRestaurant</span>
+      @if (user(); as u) {
+        <span class="sidebar-user">{{ u.name }}</span>
+      }
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        Dashboard
+      </a>
+      <a routerLink="/menu" routerLinkActive="active" class="nav-link">
+        Menu
+      </a>
+      @if (role() === 'admin') {
+        <a routerLink="/users" routerLinkActive="active" class="nav-link">
+          Team
+        </a>
+      }
+      <button type="button" class="nav-link logout" (click)="logout()">
+        Logout
+      </button>
+    </nav>
+  </aside>
+  <main class="main">
+    <button type="button" class="menu-toggle" (click)="openMenu()" aria-label="Open menu">
+      <span class="menu-toggle-line"></span>
+      <span class="menu-toggle-line"></span>
+      <span class="menu-toggle-line"></span>
+    </button>
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,105 @@
+<p><a routerLink="/menu" class="back-link">← Back to Menu</a></p>
+<h1 class="page-title">Manage menu</h1>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+@if (loading()) {
+  <p class="page-muted">Loading…</p>
+} @else {
+  <div class="manage-sections">
+    <app-card title="Categories">
+      <div class="toolbar">
+        @if (!showAddCategory()) {
+          <app-button label="Add category" variant="primary" (clicked)="addCategory()" />
+        } @else {
+          <div class="inline-form">
+            <input
+              type="text"
+              [ngModel]="newCategoryName()"
+              (ngModelChange)="newCategoryName.set($event)"
+              placeholder="Category name"
+              class="input"
+            />
+            <app-button label="Save" variant="primary" (clicked)="saveNewCategory()" />
+            <app-button label="Cancel" variant="secondary" (clicked)="cancelNewCategory()" />
+          </div>
+        }
+      </div>
+      <ul class="list">
+        @for (cat of categories(); track cat.id) {
+          <li class="list-item">
+            @if (editingCategoryId() === cat.id) {
+              <div class="inline-form">
+                <input
+                  type="text"
+                  [ngModel]="editingCategoryName()"
+                  (ngModelChange)="editingCategoryName.set($event)"
+                  class="input"
+                />
+                <app-button label="Save" variant="primary" (clicked)="saveEditCategory()" />
+                <app-button label="Cancel" variant="secondary" (clicked)="cancelEditCategory()" />
+              </div>
+            } @else {
+              <span class="list-label">{{ cat.name }}</span>
+              <span class="list-actions">
+                <button type="button" class="link-btn" (click)="startEditCategory(cat)">Edit</button>
+                <button type="button" class="link-btn danger" (click)="deleteCategory(cat.id)">Delete</button>
+              </span>
+            }
+          </li>
+        }
+      </ul>
+      @if (categories().length === 0 && !showAddCategory()) {
+        <p class="page-muted">No categories yet. Add one to organize dishes.</p>
+      }
+    </app-card>
+
+    <app-card title="Dishes">
+      <div class="toolbar">
+        <select
+          class="select"
+          [value]="categoryFilter() ?? ''"
+          (change)="categoryFilter.set(($any($event.target).value || undefined))"
+        >
+          <option value="">All categories</option>
+          @for (c of categories(); track c.id) {
+            <option [value]="c.id">{{ c.name }}</option>
+          }
+        </select>
+        <a routerLink="/menu/manage/dishes/new" class="btn-link">
+          <app-button label="Add dish" variant="primary" />
+        </a>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Active</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of filteredDishes(); track d.id) {
+            <tr>
+              <td>{{ d.name }}</td>
+              <td class="desc-cell">{{ d.description || '—' }}</td>
+              <td>{{ d.price }}</td>
+              <td>{{ categoryName(d.categoryId) }}</td>
+              <td>{{ d.isActive ? 'Yes' : 'No' }}</td>
+              <td class="actions-cell">
+                <a [routerLink]="['/menu/manage/dishes', d.id, 'edit']" class="link-btn">Edit</a>
+                <button type="button" class="link-btn danger" (click)="deleteDish(d)">Delete</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      @if (filteredDishes().length === 0) {
+        <p class="page-muted">No dishes in this filter. Add a dish or change the filter.</p>
+      }
+    </app-card>
+  </div>
+}

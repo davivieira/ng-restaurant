@@ -6,3 +6,5 @@ dist
 coverage
 .idea
 .vscode
+# backup of apps/web nested .git (converted from submodule)
+apps/web/.git.bak

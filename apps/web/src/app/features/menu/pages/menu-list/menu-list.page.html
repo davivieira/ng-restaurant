@@ -1,0 +1,42 @@
+<div class="page-header">
+  <h1 class="page-title">Menu</h1>
+  @if (role() === 'admin') {
+    <a routerLink="/menu/manage" class="edit-link">
+      <app-button label="Edit" variant="primary" />
+    </a>
+  }
+</div>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+@if (loading()) {
+  <p class="page-muted">Loading menu…</p>
+} @else {
+  <div class="menu-by-category">
+    @for (group of grouped(); track group.category.id) {
+      <app-card [title]="group.category.name">
+        <ul class="dish-list">
+          @for (dish of group.dishes; track dish.id) {
+            @if (dish.isActive) {
+              <li class="dish-item">
+                <span class="dish-name">{{ dish.name }}</span>
+                @if (dish.description) {
+                  <span class="dish-desc">{{ dish.description }}</span>
+                }
+                <span class="dish-price">{{ dish.price }}</span>
+              </li>
+            }
+          }
+        </ul>
+        @if (group.dishes.length === 0) {
+          <p class="page-muted">No dishes in this category.</p>
+        }
+      </app-card>
+    }
+  </div>
+  @if (grouped().length === 0) {
+    <app-card title="Menu">
+      <p class="page-muted">No categories or dishes yet.</p>
+    </app-card>
+  }
+}

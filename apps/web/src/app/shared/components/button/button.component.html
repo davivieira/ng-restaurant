@@ -1,0 +1,12 @@
+<button
+  type="{{ type() }}"
+  class="btn btn-{{ variant() }}"
+  [disabled]="disabled()"
+  (click)="onClick()"
+>
+  @if (label()) {
+    {{ label() }}
+  } @else {
+    <ng-content />
+  }
+</button>

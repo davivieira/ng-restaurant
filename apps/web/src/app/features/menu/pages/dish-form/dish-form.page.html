@@ -1,0 +1,77 @@
+<p><a routerLink="/menu/manage" class="back-link">← Back to manage menu</a></p>
+<h1 class="page-title">{{ isEdit() ? 'Edit dish' : 'New dish' }}</h1>
+@if (error(); as err) {
+  <p class="page-error">{{ err }}</p>
+}
+<app-card [title]="isEdit() ? 'Edit dish' : 'Add dish'">
+  <form class="form" (ngSubmit)="save()">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input
+        id="name"
+        type="text"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        name="name"
+        required
+        class="input"
+        placeholder="Dish name"
+      />
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        [ngModel]="description()"
+        (ngModelChange)="description.set($event)"
+        name="description"
+        class="input textarea"
+        placeholder="Optional description"
+        rows="3"
+      ></textarea>
+    </div>
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input
+        id="price"
+        type="number"
+        [ngModel]="price()"
+        (ngModelChange)="price.set(+$event)"
+        name="price"
+        min="0"
+        step="0.01"
+        class="input"
+      />
+    </div>
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select
+        id="category"
+        [ngModel]="categoryId() ?? ''"
+        (ngModelChange)="categoryId.set($event || null)"
+        name="category"
+        class="input"
+      >
+        <option value="">— None —</option>
+        @for (c of categories(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group checkbox-group">
+      <label>
+        <input
+          type="checkbox"
+          [ngModel]="isActive()"
+          (ngModelChange)="isActive.set($event)"
+          name="isActive"
+        />
+        Active (shown on menu)
+      </label>
+    </div>
+    <div class="form-actions">
+      <app-button type="submit" label="Save" variant="primary" />
+      <app-button type="button" label="Cancel" variant="secondary" (clicked)="cancel()" />
+    </div>
+  </form>
+</app-card>

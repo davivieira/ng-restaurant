@@ -1,0 +1,8 @@
+<div class="card">
+  @if (title(); as t) {
+    <h2 class="card-title">{{ t }}</h2>
+  }
+  <div class="card-content">
+    <ng-content />
+  </div>
+</div>

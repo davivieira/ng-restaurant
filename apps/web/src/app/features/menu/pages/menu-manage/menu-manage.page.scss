@@ -1,0 +1,154 @@
+.back-link {
+  font-size: 0.9375rem;
+  color: var(--ngr-primary);
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.page-title {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ngr-text-primary);
+}
+
+.page-error {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  color: var(--ngr-error);
+}
+
+.page-muted {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--ngr-text-muted);
+}
+
+.manage-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ngr-border);
+  border-radius: var(--ngr-radius);
+  font-size: 0.9375rem;
+  color: var(--ngr-text-primary);
+  background: var(--ngr-bg-card);
+  min-width: 200px;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ngr-border);
+  border-radius: var(--ngr-radius);
+  font-size: 0.9375rem;
+  color: var(--ngr-text-primary);
+  background: var(--ngr-bg-card);
+}
+
+.btn-link {
+  text-decoration: none;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--ngr-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.list-label {
+  flex: 1;
+  color: var(--ngr-text-primary);
+}
+
+.list-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--ngr-primary);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &.danger {
+    color: var(--ngr-error);
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--ngr-border);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--ngr-text-secondary);
+  }
+
+  .desc-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ngr-text-muted);
+  }
+
+  .actions-cell {
+    white-space: nowrap;
+  }
+
+  .actions-cell .link-btn {
+    margin-right: 0.5rem;
+  }
+}

@@ -1,0 +1,82 @@
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { AuthService } from './auth.service';
+import { environment } from '../../../../environments/environment';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AuthService],
+    });
+    service = TestBed.inject(AuthService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('should post to /auth/login with email and password', () => {
+    service.login('u@test.com', 'pass').subscribe((res) => {
+      expect(res.accessToken).toBe('tok');
+      expect(res.user.email).toBe('u@test.com');
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ email: 'u@test.com', password: 'pass' });
+    req.flush({ accessToken: 'tok', user: { id: '1', email: 'u@test.com', name: 'U', role: 'admin', restaurantId: 'r1' } });
+  });
+
+  it('should post to /auth/register with name, email, password, restaurantName', () => {
+    service
+      .register('Name', 'u@test.com', 'password123', 'Restaurant')
+      .subscribe((res) => {
+        expect(res.accessToken).toBe('tok');
+        expect(res.user.name).toBe('Name');
+      });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      name: 'Name',
+      email: 'u@test.com',
+      password: 'password123',
+      restaurantName: 'Restaurant',
+    });
+    req.flush({
+      accessToken: 'tok',
+      user: { id: '1', email: 'u@test.com', name: 'Name', role: 'admin', restaurantId: 'r1' },
+    });
+  });
+
+  it('should get waiters from GET /auth/waiters', () => {
+    const waiters = [
+      { id: '2', email: 'w@test.com', name: 'Waiter', role: 'waiter', restaurantId: 'r1' },
+    ];
+    service.getWaiters().subscribe((res) => {
+      expect(res).toEqual(waiters);
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/waiters`);
+    expect(req.request.method).toBe('GET');
+    req.flush(waiters);
+  });
+
+  it('should post to /auth/waiters with name and email', () => {
+    service.createWaiter('Waiter', 'w@test.com').subscribe((res) => {
+      expect(res.user.email).toBe('w@test.com');
+      expect(res.user.name).toBe('Waiter');
+      expect(res.user.role).toBe('waiter');
+      expect(res.temporaryPassword).toBe('temp123');
+    });
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/waiters`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ name: 'Waiter', email: 'w@test.com' });
+    req.flush({
+      user: { id: '2', email: 'w@test.com', name: 'Waiter', role: 'waiter', restaurantId: 'r1' },
+      temporaryPassword: 'temp123',
+    });
+  });
+});
